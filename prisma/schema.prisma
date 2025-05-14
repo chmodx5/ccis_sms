@@ -1,0 +1,399 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./ccis.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String
+  username      String          @unique
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  // todo: remember to specify the default role
+  role          Role
+  password      String
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String  @unique
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String?
+  access_token             String?
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String?
+  session_state            String?
+  refresh_token_expires_in Int?
+  user                     User?   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+}
+
+// the academic year is the period of time that a school, college, or university holds classes and it needs its own table
+// the class is the specific group of students that a teacher teaches and it also needs its own table
+// guardian/parent
+// emergency contact
+// student doctor
+
+// main student model
+model Student {
+  id              String       @id @default(uuid())
+  academicYearId  String
+  academicYear    AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  dateOfAdmission DateTime
+  classId         String
+  class           Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  registrationNo  String       @unique
+
+  // personal
+  firstName     String
+  middleName    String
+  surname       String
+  preferredName String
+  nationality   String
+  dateOfBirth   DateTime
+  gender        Gender
+  religion      String?
+
+  // guardians (1:M)
+  guardians Guardian[]
+
+  // documents
+  studentPhoto         String? // URL or file path
+  birthCertificatNo    String
+  birthCertificateFile String? // file path or URL
+  passportNo           String
+  expiryDate           DateTime
+  passportFile         String?
+  studentPassNo        String
+  dateOfExpiry         DateTime
+  studentPassFile      String?
+
+  // former school
+  nameOfSchool     String
+  location         String
+  reasonForExit    String
+  recentReportFile String?
+
+  // general
+  bloodType                      String?
+  whoLivesWithStudentAtHome      String
+  primaryLanguageAtHome          String
+  otherChildrenAtCCIS            Boolean?
+  referredByCurrentFamily        Boolean?
+  permissionForSocialMediaPhotos Boolean?
+  specialInformation             String
+  medicalConditions              String
+  feesContribution               Boolean?
+  feesContributionPercentage     Int
+
+  // emergency contacts
+  emergencyContacts EmergencyContact[]
+
+  // doctor(s)
+  doctors StudentDoctor[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// relationships
+model Guardian {
+  id                 String               @id @default(uuid())
+  studentId          String
+  student            Student              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  relationship       GuardianRelationship
+  fullName           String
+  occupation         String
+  residentialAddress String
+  contactPhone       String
+  whatsappNumber     String
+  emailAddress       String?
+  preferredContact   PreferredContact
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmergencyContact {
+  id             String  @id @default(uuid())
+  studentId      String
+  student        Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  fullNames      String
+  relationship   String
+  contactPhone   String
+  whatsappNumber String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudentDoctor {
+  id           String  @id @default(uuid())
+  studentId    String
+  student      Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  fullNames    String
+  contactPhone String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Class model placeholder (already mentioned in your previous requirements)
+model Class {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  students Student[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AcademicYear {
+  id        String   @id @default(uuid())
+  name      String   @unique // e.g., "2024–2025"
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(false)
+
+  students Student[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// staff
+model Staff {
+  id                    String                  @id @default(uuid())
+  staffId               String                  @unique
+  firstName             String
+  middleName            String
+  surname               String
+  gender                Gender
+  dateOfBirth           DateTime
+  nationality           String
+  designationId         String
+  designation           StaffDesignation        @relation(fields: [designationId], references: [id], onDelete: Cascade)
+  dateOfEmployment      DateTime
+  highestQualification  String
+  yearsOfWorkExperience Int
+  noOfYearsAtCCIS       Int
+  resumeURL             String
+  staffType             StaffType // either RESIDENT or INTERNATIONAL
+  comment               String
+  emergencyContacts     StaffEmergencyContact[]
+
+  // Relations to either Resident or International profile
+  // residentProfile ResidentStaff?
+  // internationalProfile InternationalStaff?
+  residentTeachingStaffProfile         ResidentTeachingStaffProfile?
+  residentNonTeachingStaffProfile      ResidentNonTeachingStaffProfile?
+  internationalTeachingStaffProfile    internationalTeachingStaffProfile?
+  InternationalNonTeachingStaffProfile InternationalNonTeachingStaffProfile?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ResidentTeachingStaffProfile {
+  id                        String @id @default(uuid())
+  nationalIdNo              String
+  nationalIdAttachment      String
+  nssfNo                    String
+  nssfAttachment            String
+  tinNo                     String
+  tinAttachment             String
+  teachingLicenseNo         String
+  teachingLicenseAttachment String
+
+  staff   Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  staffId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ResidentNonTeachingStaffProfile {
+  id                   String @id @default(uuid())
+  nationalIdNo         String
+  nationalIdAttachment String
+  nssfNo               String
+  nssfAttachment       String
+  tinNo                String
+  tinAttachment        String
+
+  staff   Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  staffId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model internationalTeachingStaffProfile {
+  id            String @id @default(uuid())
+  tcuNo         String
+  tcuAttachment String
+
+  // teaching license
+  teachingLicenseNo         String
+  expirationDate            DateTime
+  teachingLicenseAttachment String
+
+  // work permit
+  workPermitNo             String
+  workPermitExpirationDate DateTime
+  workPermitAttachment     String
+
+  // resident permit
+  residentPermitNo             String
+  residentPermitExpirationDate DateTime
+  residentPermitAttachment     String
+
+  //passport
+  passportNo             String
+  passportExpirationDate DateTime
+  passportAttachment     String
+
+  staff   Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  staffId String @unique
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+}
+
+model InternationalNonTeachingStaffProfile {
+  id String @id @default(uuid())
+
+  // work permit
+  workPermitNo             String
+  workPermitExpirationDate DateTime
+  workPermitAttachment     String
+
+  // resident permit
+  residentPermitNo             String
+  residentPermitExpirationDate DateTime
+  residentPermitAttachment     String
+
+  //passport
+  passportNo             String
+  passportExpirationDate DateTime
+  passportAttachment     String
+
+  staff   Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  staffId String @unique
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+}
+
+model StaffEmergencyContact {
+  id           String @id @default(uuid())
+  fullNames    String
+  relationship String
+  contactPhone String
+  whatsapp     String
+  staffId      String
+  staff        Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StaffDesignation {
+  id    String  @id @default(cuid())
+  name  String  @unique
+  staff Staff[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum StaffType {
+  resident_teaching_staff
+  resident_non_teaching_staff
+  international_teaching_staff
+  international_non_teaching_staff
+}
+
+enum Role {
+  admin
+  student
+  teacher
+  librarian
+}
+
+// enums
+enum Gender {
+  male
+  female
+}
+
+enum PreferredContact {
+  phone
+  email
+  sms
+  whatsapp
+}
+
+enum GuardianRelationship {
+  mother
+  father
+  guardian
+}

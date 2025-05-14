@@ -1,0 +1,15 @@
+what i have just done
+i have installed and setup shadcn and next-auth
+- created the seed file at prisma/seed.ts the command is npx prisma db seed
+
+
+what i have to do next is create the sign in page and sign up page
+consider renaming the levels to classes then the classes to either sections or streams but both make sense-ish
+
+then copy the things from unified especially the database schemas to this one then finally start on the forms and the form action, chatgpt will be very useful on the form actions part
+
+
+are the exams for the entire level or for one partucular class, for now i have put them for one calss
+
+let me deal with the students and staff for now then come back to the exams later on
+
