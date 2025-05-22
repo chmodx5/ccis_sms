@@ -8,6 +8,7 @@ import React from "react";
 import { AppSidebar } from "./app-sidebar";
 import { ADMIN_SIDEBAR_ITEMS, TEACHER_SIDEBAR_ITEMS } from "@/site-config";
 import { AppBreadCrumbs } from "@/components/app-breadcrumbs";
+import { UserDropdown } from "./user-dropdown";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -20,33 +21,36 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
     return (
         <>
-            <SidebarProvider className="">
+            <SidebarProvider>
                 <AppSidebar
                     items={
-                        userRole == "admin"
+                        userRole === "admin"
                             ? ADMIN_SIDEBAR_ITEMS
-                            : userRole == "teacher"
+                            : userRole === "teacher"
                             ? TEACHER_SIDEBAR_ITEMS
                             : []
                     }
                 />
-                {/* <SidebarInset> */}
-                <SidebarInset className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden bg-muted relative">
-                    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-background border-b fixed top-0 w-full z-10">
-                        <div className="flex items-center gap-2 px-4">
+                <SidebarInset className="flex flex-col h-screen bg-muted">
+                    {/* Sticky header inside inset container */}
+                    <header className="sticky top-0 z-30 py-4 flex items-center justify-between px-4 border-b bg-background">
+                        <div className="flex items-center space-x-2">
                             <SidebarTrigger className="-ml-1" />
-                            <Separator
-                                orientation="vertical"
-                                className="mr-2 h-4"
-                            />
-                            <h1 className="text-lg font-semibold">
-                                CCIS School Management System
-                            </h1>
-                            {/* <AppBreadCrumbs /> */}
+                            <div>
+                                <h1 className="font-semibold">
+                                    CCIS school management system
+                                </h1>
+                            </div>
+                        </div>
+                        <div>
+                            <UserDropdown />
                         </div>
                     </header>
-                    <div className="px-4 py-4 mt-16">{children}</div>{" "}
-                    {/* Added mt-16 */}
+
+                    {/* Scrollable content */}
+                    <div className="flex-1 overflow-y-auto px-4 py-4">
+                        {children}
+                    </div>
                 </SidebarInset>
             </SidebarProvider>
         </>

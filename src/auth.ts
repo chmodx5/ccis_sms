@@ -2,23 +2,35 @@ import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { compare } from "bcryptjs";
 import { prisma } from "@/prisma"; // or your actual prisma client path
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 
-export const authConfig = {
+declare module "next-auth" {
+    /**
+     * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+     */
+    interface Session {
+        user: {
+            role: string;
+        } & DefaultSession["user"];
+    }
+}
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
         Credentials({
             async authorize(credentials) {
+                const email = credentials.email as string;
+                const password = credentials.password as string;
+                if (!password) return null;
+                if (!email) return null;
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email },
+                    where: { email },
                 });
 
                 if (!user || !user.password) return null;
 
-                const isValid = await compare(
-                    credentials.password,
-                    user.password
-                );
+                const isValid = await compare(password, user.password);
                 if (!isValid) return null;
 
                 return user;
@@ -37,11 +49,9 @@ export const authConfig = {
         },
         async session({ session, token }) {
             if (session.user) {
-                session.user.role = token.role;
+                session.user.role = token.role as string;
             }
             return session;
         },
     },
-};
-
-export const { handlers, signIn, signOut, auth } = NextAuth(authConfig);
+});

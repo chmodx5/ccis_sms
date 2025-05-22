@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
             "cdn.jsdelivr.net",
             "avatars.githubusercontent.com",
             "sore-outrun.com",
+            "rewarding-backbone.biz",
+            "lost-atrium.com",
+            "deafening-affiliate.biz",
+            "loremflickr.com",
         ],
     },
 };

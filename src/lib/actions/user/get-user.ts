@@ -5,7 +5,7 @@ import { Prisma, User } from "@prisma/client";
 
 export type GetUserResultUser = User;
 
-interface GetUserSuccessResult {
+export interface GetUserSuccessResult {
     success: true;
     data: GetUserResultUser;
 }

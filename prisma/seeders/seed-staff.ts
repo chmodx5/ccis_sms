@@ -91,7 +91,7 @@ export async function seedStaff(
     let staffIdxCounter = 0; // Counter for generating unique staff IDs
 
     // Helper to generate fake attachment URLs, similar to seedStudents
-    const generateAttachmentUrl = () => faker.image.url();
+    const generateAttachmentUrl = () => faker.image.urlLoremFlickr();
 
     // Step 3: Generate data for Teacher staff members
     console.log(`⚙️ Generating ${params.teachers} teacher records...`);
@@ -185,8 +185,12 @@ export async function seedStaff(
                     "friend",
                     "child",
                 ]),
-                contactPhone: faker.phone.number(),
-                whatsapp: faker.phone.number(), // Can be the same or different
+                contactPhone: faker.phone.number({
+                    style: "international",
+                }),
+                whatsapp: faker.phone.number({
+                    style: "international",
+                }), // Can be the same or different
             });
         }
 
@@ -325,10 +329,11 @@ export async function seedStaff(
             ),
             yearsOfWorkExperience,
             noOfYearsAtCCIS,
-            resumeURL:
-                faker.internet.url() +
-                "/resume_" +
-                faker.system.commonFileName("pdf"),
+            resumeURL: generateAttachmentUrl(),
+            // resumeURL:
+            //     faker.internet.url() +
+            //     "/resume_" +
+            //     faker.system.commonFileName("pdf"),
             staffType,
             comment: faker.lorem.sentence(),
             profileData: {},
@@ -346,8 +351,12 @@ export async function seedStaff(
                     "friend",
                     "child",
                 ]),
-                contactPhone: faker.phone.number(),
-                whatsapp: faker.phone.number(),
+                contactPhone: faker.phone.number({
+                    style: "international",
+                }),
+                whatsapp: faker.phone.number({
+                    style: "international",
+                }),
             });
         }
 

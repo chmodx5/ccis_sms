@@ -57,23 +57,23 @@ export async function seedStudents(count: number = 10, prisma: PrismaClient) {
             dateOfBirth: dob,
             gender,
             religion: faker.word.noun(),
-            studentPhoto: faker.image.avatar(),
+            studentPhoto: faker.image.urlLoremFlickr(),
 
             // 📄 Document Info
             birthCertificatNo: faker.helpers.replaceSymbols("BC########"),
-            birthCertificateFile: faker.image.url(),
+            birthCertificateFile: faker.image.urlLoremFlickr(),
             passportNo: faker.helpers.replaceSymbols("P########"),
             expiryDate, // For passport
-            passportFile: faker.image.url(),
+            passportFile: faker.image.urlLoremFlickr(),
             studentPassNo: faker.helpers.replaceSymbols("SP########"),
             dateOfExpiry: expiryDate, // For student pass (can be same as passport for simplicity)
-            studentPassFile: faker.image.url(),
+            studentPassFile: faker.image.urlLoremFlickr(),
 
             // 🏫 Previous School Info
             nameOfSchool: faker.company.name(),
             location: faker.location.city(),
             reasonForExit: faker.lorem.sentence(),
-            recentReportFile: faker.image.url(),
+            recentReportFile: faker.image.urlLoremFlickr(),
 
             // ➕ Additional Info
             bloodType: faker.helpers.arrayElement(["A", "B", "AB", "O"]),
@@ -96,8 +96,12 @@ export async function seedStudents(count: number = 10, prisma: PrismaClient) {
                     fullName: faker.person.fullName(),
                     occupation: faker.person.jobTitle(),
                     residentialAddress: faker.location.streetAddress(),
-                    contactPhone: faker.phone.number(),
-                    whatsappNumber: faker.phone.number(),
+                    contactPhone: faker.phone.number({
+                        style: "international",
+                    }),
+                    whatsappNumber: faker.phone.number({
+                        style: "international",
+                    }),
                     emailAddress: faker.internet.email(),
                     preferredContact: faker.helpers.arrayElement(
                         Object.values(PreferredContact)
@@ -117,8 +121,12 @@ export async function seedStudents(count: number = 10, prisma: PrismaClient) {
                             "grandparent", // Added more variety
                             "family_friend",
                         ]),
-                        contactPhone: faker.phone.number(),
-                        whatsappNumber: faker.phone.number(),
+                        contactPhone: faker.phone.number({
+                            style: "international",
+                        }),
+                        whatsappNumber: faker.phone.number({
+                            style: "international",
+                        }),
                     })
                 ),
             },
@@ -126,7 +134,9 @@ export async function seedStudents(count: number = 10, prisma: PrismaClient) {
             doctors: {
                 create: Array.from({ length: numDoctors }).map(() => ({
                     fullNames: faker.person.fullName(),
-                    contactPhone: faker.phone.number(),
+                    contactPhone: faker.phone.number({
+                        style: "international",
+                    }),
                 })),
             },
         };

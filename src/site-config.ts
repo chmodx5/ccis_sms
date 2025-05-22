@@ -168,6 +168,10 @@ export const ADMIN_SIDEBAR_ITEMS: AppSidebarContentProps["items"] = [
             },
         ],
     },
+    {
+        title: "Profile",
+        url: "/profile",
+    },
 ];
 
 export const TEACHER_SIDEBAR_ITEMS: AppSidebarContentProps["items"] = [

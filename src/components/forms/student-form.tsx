@@ -753,7 +753,7 @@ export const StudentForm: React.FC<Props> = ({
                                                 name={`guardians.${index}.contactPhone`}
                                                 label="Contact Phone*"
                                                 placeholder="Enter contact phone"
-                                                type="number"
+                                                type="text"
                                             />
                                             {/* whatsapp number  */}
                                             <TextInput
@@ -762,7 +762,7 @@ export const StudentForm: React.FC<Props> = ({
                                                 name={`guardians.${index}.whatsappNumber`}
                                                 label="Whatsapp Number"
                                                 placeholder="Enter whatsapp number"
-                                                type="number"
+                                                type="text"
                                             />
                                             {/* email address  */}
                                             <TextInput
@@ -1178,7 +1178,7 @@ export const StudentForm: React.FC<Props> = ({
                                                     name={`emergencyContacts.${index}.contactPhone`}
                                                     label="Contact Phone*"
                                                     placeholder="Enter contact phone"
-                                                    type="number"
+                                                    type="text"
                                                 />
                                                 {/* whatsapp number */}
                                                 <TextInput
@@ -1187,7 +1187,7 @@ export const StudentForm: React.FC<Props> = ({
                                                     name={`emergencyContacts.${index}.whatsappNumber`}
                                                     label="Whatsapp Number"
                                                     placeholder="Enter whatsapp number"
-                                                    type="number"
+                                                    type="text"
                                                 />
                                             </CardContent>
                                         </Card>
@@ -1264,7 +1264,7 @@ export const StudentForm: React.FC<Props> = ({
                                                 name={`doctors.${index}.contactPhone`}
                                                 label="Contact  Phone*"
                                                 placeholder="Enter contact phone"
-                                                type="number"
+                                                type="text"
                                             />
                                         </CardContent>
                                     </Card>
